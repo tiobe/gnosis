@@ -2,15 +2,21 @@
 
 class WebhookHandler
   def initialize
-    @client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
+    @client = GithubAppClient.client
   end
 
   def handle_github(params)
     number = NumberExtractor.call(params)
+    return unless number.present?
 
-    return unless number.present? && Issue.exists?(id: number)
+    issue = Issue.find_by(id: number)
+    return unless issue
 
-    PullRequest.auto_create_or_update(params.merge(issue_id: number))
+    pr = PullRequest.auto_create_or_update(params.merge(issue_id: issue.id))
+    return unless pr
+
+    # Call PullRequestService to update GitHub with the issue status
+    PullRequestService.new.create_check_run(issue.id, [pr], issue.status.name)
   end
 
   def handle_semaphore(params)
@@ -23,12 +29,11 @@ class WebhookHandler
     org = params[:organization][:name]
     workflow_id = params[:workflow][:id]
 
-    first_sha, last_sha = range.split('...')
+    first_sha = range.split('...').first
+    last_sha = range.split('...').last
 
     sha_between = fetch_commit_history(repo, first_sha, last_sha)
     create_deploys_for_pull_requests(semaphore_url(org, workflow_id), sha_between, branch, passed, time)
-  rescue Octokit::NotFound
-    nil
   end
 
   private

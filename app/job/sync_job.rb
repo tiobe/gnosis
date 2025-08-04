@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class SyncJob < ApplicationJob
+class SyncJob < ActiveJob::Base
   def perform
     info('Starting with pull request sync')
-    PullRequestSyncService.new.call
+    PullRequestService.new.sync
     info('End pull request sync')
   end
 

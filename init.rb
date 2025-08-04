@@ -1,11 +1,17 @@
 # frozen_string_literal: true
 
 require 'redmine'
+require 'openssl'
+require 'jwt'
+
 require_relative 'lib/issue_details_hook_listener'
+require_relative 'lib/gnosis/issue_patch'
 
 def check_env
   ENV['GITHUB_WEBHOOK_SECRET'].present? ||
-    ENV['GITHUB_ACCESS_TOKEN'].present? ||
+    ENV['GITHUB_APP_ID'].present? ||
+    ENV['GITHUB_INSTALLATION_ID'].present? ||
+    ENV['GITHUB_PRIVATE_KEY_PATH'].present? ||
     ENV['SEMAPHORE_WEBHOOK_SECRET'].present? ||
     ENV['GITHUB_ORGANIZATION_NAME'].present?
 end
@@ -22,7 +28,9 @@ if !check_env && !Rails.env.test?
 end
 # :nocov:
 
-raise 'GITHUB_ACCESS_TOKEN is not set' if ENV['GITHUB_ACCESS_TOKEN'].blank? && !Rails.env.test?
+raise 'GITHUB_APP_ID is not set' if ENV['GITHUB_APP_ID'].blank? && !Rails.env.test?
+raise 'GITHUB_INSTALLATION_ID is not set' if ENV['GITHUB_INSTALLATION_ID'].blank? && !Rails.env.test?
+raise 'GITHUB_PRIVATE_KEY_PATH is not set' if ENV['GITHUB_PRIVATE_KEY_PATH'].blank? && !Rails.env.test?
 
 Redmine::Plugin.register :gnosis do
   name 'Gnosis plugin'

@@ -8,3 +8,5 @@ group :test, :development do
 end
 
 gem 'octokit'
+gem 'openssl'
+gem 'jwt'

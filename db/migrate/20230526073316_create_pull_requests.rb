@@ -4,8 +4,10 @@ class CreatePullRequests < ActiveRecord::Migration[6.1]
       t.string :state
       t.string :url
       t.string :title
+      t.string :repo
       t.string :source_branch
       t.string :target_branch
+      t.string :head_sha
       t.string :merge_commit_sha
       t.boolean :was_merged, default: false, null: false
       t.references :issue, null: false

@@ -2,8 +2,8 @@
 
 class NumberExtractor
   DIG_FIND_DATA = [
-    { keys: %i[pull_request head ref], match_regex: %r{/(\d+)} },
-    { keys: %i[pull_request body], match_regex: /TICKET-(\d+)/ },
+    { keys: %i[pull_request head ref], match_regex: /(\d+)-.*/ },
+    { keys: %i[pull_request body], match_regex: /.*\(R(\d+)\).*/ },
   ].freeze
 
   def self.call(params)

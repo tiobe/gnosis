@@ -9,7 +9,7 @@ class IssueDetailsHookListener < Redmine::Hook::ViewListener
     <<-HTML
       <hr/>
       <p><strong>Pull Requests</strong></p>
-      #{@pr_string.length.positive? ? "<ul>#{@pr_string}</ul>" : 'There are currently no PRs open for this issue'}
+      #{@pr_string.length.positive? ? "<ul>#{@pr_string}</ul>" : '<p>There are currently no PRs open for this issue</p>'}
     HTML
   end
 
@@ -33,9 +33,11 @@ class IssueDetailsHookListener < Redmine::Hook::ViewListener
   end
 
   def set_deployment_strings
-    @deployments_strings = @deployments.map do |deployment_list|
-      deployment_list.map do |deployment|
-        <<-LISTOBJECT
+    @deployments_strings = []
+    @deployments.each do |deployment_list|
+      formatted_deployment_list = []
+      deployment_list.each do |deployment|
+        formatted_deployment_list << <<-LISTOBJECT
           <li>
             <a href='#{deployment['url']}' target='_blank' id='deployment-#{deployment['id']}'>
               on "#{deployment['deploy_branch']}"
@@ -45,6 +47,7 @@ class IssueDetailsHookListener < Redmine::Hook::ViewListener
           </li>
         LISTOBJECT
       end
+      @deployments_strings << formatted_deployment_list
     end
   end
 
