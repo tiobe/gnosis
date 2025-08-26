@@ -43,7 +43,7 @@ class PullRequestService
                 title: "RM-#{id}: #{status}",
                 summary: "Status: #{status}"
               },
-              details_url: "https://redmine-staging.tiobe.com/issues/#{id}",
+              details_url: "https://redmine.tiobe.com/issues/#{id}",
             }
           )
         rescue Octokit::Error => e
